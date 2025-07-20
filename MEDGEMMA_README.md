@@ -21,12 +21,33 @@ A Python program that uses Google's MedGemma model to parse medical documents an
 
 ## 🛠️ Installation
 
-1. **Install dependencies:**
+### **Prerequisites:**
+
+1. **Hugging Face Account**: You need a Hugging Face account to access MedGemma
+2. **Accept Model Terms**: MedGemma requires accepting model terms before use
+
+### **Setup Process:**
+
+1. **Run the MedGemma setup script:**
+   ```bash
+   python setup_medgemma.py
+   ```
+
+2. **Or manually install dependencies:**
    ```bash
    pip install -r medgemma_requirements.txt
    ```
 
-2. **For GPU support (optional):**
+3. **Authenticate with Hugging Face:**
+   ```bash
+   huggingface-cli login
+   ```
+
+4. **Accept MedGemma model terms:**
+   - Visit: https://huggingface.co/google/medgemma-2b
+   - Click "Accept" to agree to the model terms
+
+5. **For GPU support (optional):**
    ```bash
    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
    ```
@@ -240,16 +261,38 @@ def check_completeness(parsed_doc):
 
 ## 🔧 Troubleshooting
 
-### Common Issues
+### Authentication Issues
+
+1. **401 Unauthorized Error**:
+   ```bash
+   # Solution: Accept model terms and login
+   huggingface-cli login
+   # Then visit: https://huggingface.co/google/medgemma-2b
+   # Click "Accept" to agree to terms
+   ```
+
+2. **Model Not Found Error**:
+   - Ensure you're using the correct model name
+   - Available models: `google/medgemma-2b`, `google/medgemma-7b`, `google/medgemma-2b-it`
+
+3. **Token Issues**:
+   ```bash
+   # Set environment variable
+   export HF_TOKEN=your_token_here
+   # Or use the setup script
+   python setup_medgemma.py
+   ```
+
+### Performance Issues
 
 1. **Out of Memory**: 
-   - Use smaller model variants
+   - Use smaller model variants (`google/medgemma-2b` instead of `google/medgemma-7b`)
    - Enable quantization (`LOAD_IN_8BIT=true`)
    - Process documents in smaller chunks
 
 2. **Model Download Issues**:
    - Check internet connection
-   - Clear cache directory
+   - Clear cache directory: `rm -rf ./medgemma_cache`
    - Verify Hugging Face Hub access
 
 3. **Low Confidence Scores**:

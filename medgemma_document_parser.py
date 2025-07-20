@@ -55,7 +55,7 @@ class ParsedDocument:
 class MedGemmaDocumentParser:
     """Main class for parsing medical documents using MedGemma."""
     
-    def __init__(self, model_name: str = "microsoft/DialoGPT-medium", cache_dir: str = "./medgemma_cache"):
+    def __init__(self, model_name: str = "google/medgemma-2b", cache_dir: str = "./medgemma_cache"):
         """Initialize the MedGemma document parser."""
         self.model_name = model_name
         self.cache_dir = cache_dir
@@ -74,6 +74,14 @@ class MedGemmaDocumentParser:
     def load_model(self):
         """Load the MedGemma model and tokenizer."""
         print(f"📥 Loading MedGemma model: {self.model_name}")
+        
+        # Check if user is authenticated for MedGemma
+        if "medgemma" in self.model_name.lower():
+            print("🔐 MedGemma requires authentication. Please ensure you have:")
+            print("   1. A Hugging Face account")
+            print("   2. Accepted the MedGemma model terms at: https://huggingface.co/google/medgemma-2b")
+            print("   3. Logged in with: huggingface-cli login")
+            print("   4. Or set your token: export HF_TOKEN=your_token_here")
         
         try:
             # Load tokenizer
@@ -102,7 +110,23 @@ class MedGemmaDocumentParser:
             print("✅ MedGemma model loaded successfully")
             
         except Exception as e:
-            print(f"❌ Error loading MedGemma model: {e}")
+            error_msg = str(e)
+            if "401" in error_msg or "unauthorized" in error_msg.lower():
+                print(f"❌ Authentication Error: {error_msg}")
+                print("🔐 To fix this:")
+                print("   1. Visit: https://huggingface.co/google/medgemma-2b")
+                print("   2. Click 'Accept' to agree to the model terms")
+                print("   3. Run: huggingface-cli login")
+                print("   4. Or set environment variable: export HF_TOKEN=your_token_here")
+                print("   5. Restart the script")
+            elif "not found" in error_msg.lower():
+                print(f"❌ Model not found: {error_msg}")
+                print("🔍 Available MedGemma models:")
+                print("   - google/medgemma-2b (2B parameters)")
+                print("   - google/medgemma-7b (7B parameters)")
+                print("   - google/medgemma-2b-it (instruction-tuned)")
+            else:
+                print(f"❌ Error loading MedGemma model: {error_msg}")
             raise
     
     def generate_response(self, prompt: str, max_length: int = 512, temperature: float = 0.1) -> str:
